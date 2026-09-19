@@ -1,3 +1,6 @@
+
+import type { User } from '../types/report.types';
+
 export enum LostItemCategory {
   Electronics = 'Electronics',
   DocumentsAndIds = 'Documents & IDs',
@@ -113,7 +116,7 @@ export const MOCK_REPORTS: Report[] = [
     title: 'Set of House & Car Keys on Red Lanyard',
     description: 'Three metal keys, one car key fob, attached to an embroidered red nylon lanyard.',
     category: LostItemCategory.Keys,
-    location: 'Computer Lab 4, Desk 12',
+    location: 'Computer Lab 4, Desk 12' ,
     date: '2026-09-18T16:00:00.000Z',
     imagePath: 'https://images.unsplash.com/photo-1582139329536-e7284fece509',
     color: 'Red',
@@ -124,11 +127,10 @@ export const MOCK_REPORTS: Report[] = [
   }
 ];
 
-// // src/dummy/mock.ts
-// import type { User } from '../types/report.types';
 
-// export const MOCK_USER: User = {
-//   _id: 'user_101',
-//   name: 'Alex Rivera',
-//   email: 'alex.rivera@example.com',
-// };
+export const MOCK_USER: User = {
+  _id: 'user_101',
+  name: 'Alex Rivera',
+  email: 'alex.rivera@example.com',
+
+};

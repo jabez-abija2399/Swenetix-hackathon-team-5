@@ -1,34 +1,40 @@
 :root {
-  --bg-main: #0d1117;
-  --bg-surface: #161b22;
-  --bg-elevated: #21262d;
-  --border-subtle: #30363d;
-  --border-focus: #58a6ff;
+  /* Surfaces */
+  --bg-main: #FAF7F2;
+  --bg-surface: #FFFFFF;
+  --bg-elevated: #F1ECE1;
+  --border-subtle: #E3DCCB;
+  --border-focus: #8B5E3C;
 
-  --text-primary: #f0f6fc;
-  --text-secondary: #8b949e;
-  --text-muted: #6e7681;
+  /* Text */
+  --text-primary: #2B2A28;
+  --text-secondary: #6B6459;
+  --text-muted: #9A927F;
 
-  --brand-primary: #238636;
-  --brand-primary-hover: #2ea043;
-  --brand-accent: #388bfd;
+  /* Brand */
+  --brand-primary: #8B5E3C;
+  --brand-primary-hover: #74492E;
+  --brand-accent: #6E5B47;
 
-  --danger: #f85149;
-  --danger-surface: rgba(248, 81, 73, 0.15);
-  --warning: #d29922;
-  --success: #3fb950;
-  --success-surface: rgba(63, 185, 80, 0.15);
+  /* Status */
+  --lost: #B54834;
+  --lost-surface: rgba(181, 72, 52, 0.08);
+  --found: #4A6B57;
+  --found-surface: rgba(74, 107, 87, 0.1);
+  --warning: #A67C2E;
 
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  /* Radii — smaller, quieter; this isn't a rounded SaaS-card product */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
   --radius-full: 9999px;
 
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --shadow-sm: 0 1px 2px rgba(43, 42, 40, 0.06);
+  --shadow-md: 0 3px 10px rgba(43, 42, 40, 0.08);
+  --shadow-lg: 0 10px 30px rgba(43, 42, 40, 0.14);
 
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Source Serif 4", "Lora", Georgia, "Times New Roman", serif;
   --transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -42,12 +48,12 @@ body {
   font-family: var(--font-sans);
   background-color: var(--bg-main);
   color: var(--text-primary);
-  line-height: 1.5;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
 
 a {
-  color: var(--brand-accent);
+  color: var(--brand-primary);
   text-decoration: none;
   transition: var(--transition);
 }
@@ -57,7 +63,7 @@ a:hover {
 }
 
 /* ==========================================================================
-   Navigation Bar (nav)
+   Navigation Bar
    ========================================================================== */
 nav {
   display: flex;
@@ -69,7 +75,6 @@ nav {
   position: sticky;
   top: 0;
   z-index: 100;
-  backdrop-filter: blur(8px);
 }
 
 nav a {
@@ -87,17 +92,20 @@ nav a:hover {
 }
 
 nav a:first-child {
+  font-family: var(--font-serif);
   color: var(--text-primary);
-  font-weight: 700;
-  font-size: 1.1rem;
+  font-weight: 600;
+  font-size: 1.2rem;
 }
 
 /* ==========================================================================
-   Report Grid & Cards (.report-list, .report-card)
+   Report Grid & Cards
+   A quiet noticeboard feel: a thin left rule in the status color reads like
+   a flyer pinned by category, rather than an identical rounded SaaS card.
    ========================================================================== */
 .report-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.25rem;
   max-width: 1200px;
   margin: 2rem auto;
@@ -107,24 +115,33 @@ nav a:first-child {
 .report-card {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-subtle);
+  border-left: 3px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 1.25rem;
+  padding: 1.25rem 1.35rem;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.6rem;
   transition: var(--transition);
   box-shadow: var(--shadow-sm);
 }
 
+.report-card:has(.badge-lost) {
+  border-left-color: var(--lost);
+}
+
+.report-card:has(.badge-found) {
+  border-left-color: var(--found);
+}
+
 .report-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--text-muted);
   box-shadow: var(--shadow-md);
+  border-color: var(--text-muted);
 }
 
 .report-card h3 {
-  font-size: 1.15rem;
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -135,46 +152,44 @@ nav a:first-child {
 }
 
 /* ==========================================================================
-   Badges (.badge, .badge-lost, .badge-found)
+   Badges — sentence case, not tracked-out all-caps
    ========================================================================== */
 .badge {
   display: inline-flex;
   align-items: center;
   align-self: flex-start;
-  padding: 0.2rem 0.65rem;
+  padding: 0.2rem 0.7rem;
   border-radius: var(--radius-full);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .badge-lost {
-  background-color: var(--danger-surface);
-  color: var(--danger);
-  border: 1px solid rgba(248, 81, 73, 0.4);
+  background-color: var(--lost-surface);
+  color: var(--lost);
+  border: 1px solid rgba(181, 72, 52, 0.3);
 }
 
 .badge-found {
-  background-color: var(--success-surface);
-  color: var(--success);
-  border: 1px solid rgba(63, 185, 80, 0.4);
+  background-color: var(--found-surface);
+  color: var(--found);
+  border: 1px solid rgba(74, 107, 87, 0.3);
 }
 
 .badge-open {
-  background-color: var(--danger-surface);
-  color: var(--danger);
-  border: 1px solid rgba(248, 81, 73, 0.4);
+  background-color: var(--lost-surface);
+  color: var(--lost);
+  border: 1px solid rgba(181, 72, 52, 0.3);
 }
 
 .badge-resolved {
-  background-color: var(--success-surface);
-  color: var(--success);
-  border: 1px solid rgba(63, 185, 80, 0.4);
+  background-color: var(--found-surface);
+  color: var(--found);
+  border: 1px solid rgba(74, 107, 87, 0.3);
 }
 
 /* ==========================================================================
-   Forms & Controls (ReportForm, Login, Edit)
+   Forms & Controls
    ========================================================================== */
 form {
   display: flex;
@@ -186,7 +201,7 @@ form {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   padding: 2rem;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
 }
 
 form input,
@@ -208,7 +223,7 @@ form input:focus,
 form textarea:focus,
 form select:focus {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(139, 94, 60, 0.15);
 }
 
 form textarea {
@@ -220,15 +235,14 @@ form select {
   cursor: pointer;
 }
 
-/* Form validation error text */
 form span {
-  color: var(--danger);
+  color: var(--lost);
   font-size: 0.8rem;
   margin-top: -0.5rem;
 }
 
 /* ==========================================================================
-   Auth Pages (Login)
+   Auth Pages
    ========================================================================== */
 .auth-page {
   min-height: calc(100vh - 64px);
@@ -245,17 +259,17 @@ form span {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   padding: 2rem;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
 }
 
 .auth-title {
+  font-family: var(--font-serif);
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 600;
   text-align: center;
   margin-bottom: 1.5rem;
 }
 
-/* Auth form lives inside the card, so neutralise the global `form` styles */
 form.auth-form {
   max-width: none;
   margin: 0;
@@ -268,10 +282,10 @@ form.auth-form {
 
 .auth-error {
   padding: 0.75rem 1rem;
-  background-color: var(--danger-surface);
-  border: 1px solid var(--danger);
+  background-color: var(--lost-surface);
+  border: 1px solid var(--lost);
   border-radius: var(--radius-md);
-  color: var(--danger);
+  color: var(--lost);
   font-size: 0.875rem;
 }
 
@@ -308,7 +322,7 @@ form.auth-form {
 
 .form-field input:focus {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(139, 94, 60, 0.15);
 }
 
 button.btn-block {
@@ -318,7 +332,7 @@ button.btn-block {
   font-weight: 600;
 }
 
-/* Generic Buttons */
+/* Buttons */
 button {
   display: inline-flex;
   align-items: center;
@@ -326,7 +340,7 @@ button {
   padding: 0.6rem 1.25rem;
   background-color: var(--brand-primary);
   color: #ffffff;
-  border: 1px solid rgba(240, 246, 252, 0.1);
+  border: 1px solid transparent;
   border-radius: var(--radius-sm);
   font-size: 0.925rem;
   font-weight: 600;
@@ -339,15 +353,13 @@ button:hover:not(:disabled) {
 }
 
 button:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 /* ==========================================================================
    Common State Components
    ========================================================================== */
-
-/* .spinner */
 .spinner {
   display: flex;
   align-items: center;
@@ -364,7 +376,7 @@ button:disabled {
   width: 1.2rem;
   height: 1.2rem;
   border: 2px solid var(--border-subtle);
-  border-top-color: var(--brand-accent);
+  border-top-color: var(--brand-primary);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
 }
@@ -373,20 +385,18 @@ button:disabled {
   to { transform: rotate(360deg); }
 }
 
-/* .error-message */
 .error-message {
   max-width: 600px;
   margin: 2rem auto;
   padding: 1rem 1.25rem;
-  background-color: var(--danger-surface);
-  border: 1px solid var(--danger);
+  background-color: var(--lost-surface);
+  border: 1px solid var(--lost);
   border-radius: var(--radius-md);
-  color: var(--danger);
+  color: var(--lost);
   font-size: 0.9rem;
   text-align: center;
 }
 
-/* .empty-state */
 .empty-state {
   max-width: 480px;
   margin: 4rem auto;
@@ -396,16 +406,16 @@ button:disabled {
   border: 1px dashed var(--border-subtle);
   border-radius: var(--radius-lg);
   font-size: 1rem;
+  font-family: var(--font-serif);
 }
 
 /* ==========================================================================
-   Modals & Overlays (.confirm-dialog-overlay, .confirm-dialog)
+   Modals & Overlays
    ========================================================================== */
 .confirm-dialog-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(1, 4, 9, 0.75);
-  backdrop-filter: blur(4px);
+  background-color: rgba(43, 42, 40, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -438,12 +448,11 @@ button:disabled {
 }
 
 .confirm-dialog button:first-of-type {
-  background-color: var(--danger);
-  border-color: transparent;
+  background-color: var(--lost);
 }
 
 .confirm-dialog button:first-of-type:hover {
-  background-color: #d9383a;
+  background-color: #9C3D2C;
 }
 
 .confirm-dialog button:last-of-type {
@@ -465,4 +474,150 @@ button:disabled {
 @keyframes scaleUp {
   from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
+}
+
+.report-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.report-filters__search {
+  width: 100%;
+}
+
+.report-filters__input {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.9375rem;
+  line-height: 1.25rem;
+  color: #111827;
+  background: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.report-filters__input::placeholder {
+  color: #9ca3af;
+}
+
+.report-filters__input:hover {
+  border-color: #9ca3af;
+}
+
+.report-filters__input:focus {
+  outline: none;
+  background: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.report-filters__group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.report-filters__select {
+  flex: 1 1 160px;
+  min-width: 140px;
+  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #111827;
+  background-color: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.625rem center;
+  background-size: 16px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.report-filters__select:hover {
+  border-color: #9ca3af;
+}
+
+.report-filters__select:focus {
+  outline: none;
+  background-color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.report-filters__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.report-filters__count {
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+.report-filters__reset {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #2563eb;
+  background: transparent;
+  border: 1px solid #bfdbfe;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.report-filters__reset:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+.report-filters__reset:active {
+  background: #dbeafe;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (min-width: 640px) {
+  .report-filters {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .report-filters__search {
+    flex: 1 1 240px;
+  }
+
+  .report-filters__group {
+    flex: 2 1 auto;
+  }
+
+  .report-filters__meta {
+    flex: 0 0 auto;
+    border-top: none;
+    padding-top: 0;
+  }
 }

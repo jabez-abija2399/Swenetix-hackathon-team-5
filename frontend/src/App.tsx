@@ -14,23 +14,28 @@ export default function App() {
       <Navbar />
 
       <Routes>
-        <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+        <Route path="/" element={
+          // <ProtectedRoute>
+          <Home />
+          //  </ProtectedRoute>
+          } 
+          />
         <Route path="/login" element={<Login />} />
         <Route
           path="/reports/new"
           element={
-            <ProtectedRoute>
+           // <ProtectedRoute>
               <CreateReport />
-            </ProtectedRoute>
+            // </ProtectedRoute>
           }
         />
         <Route path="/reports/:id" element={<ReportDetail />} />
         <Route
           path="/reports/:id/edit"
           element={
-            <ProtectedRoute>
+            // <ProtectedRoute>
               <EditReport />
-            </ProtectedRoute>
+            // </ProtectedRoute> */}
           }
         />
         <Route path="*" element={<NotFound />} />
