@@ -1,105 +1,98 @@
-// import axiosInstance from './axiosInstance';
-// import type { Report, ReportFormData } from '../types/report.types';
-
-// export const getAllReports = async (): Promise<Report[]> => {
-//   const res = await axiosInstance.get('/reports');
-//   return res.data;
-// };
-
-// export const getReportById = async (id: string): Promise<Report> => {
-//   const res = await axiosInstance.get(`/reports/${id}`);
-//   return res.data;
-// };
-
-// export const createReport = async (data: ReportFormData): Promise<Report> => {
-//   const res = await axiosInstance.post('/reports', data);
-//   return res.data;
-// };
-
-// export const updateReport = async (id: string, data: ReportFormData): Promise<Report> => {
-//   const res = await axiosInstance.put(`/reports/${id}`, data);
-//   return res.data;
-// };
-
-// export const deleteReport = async (id: string): Promise<void> => {
-//   await axiosInstance.delete(`/reports/${id}`);
-// };
-
-
-
 import axiosInstance from './axiosInstance';
-import type { Report, ReportFormData } from '../types/report.types';
-import { MOCK_REPORTS } from '../dummy/mock';
+import { mockReportService } from '../mocks';
+import type {
+  Report,
+  ReportFormData,
+  ReportFilterParams,
+} from '../types/report.types';
 
-// 🟢 TOGGLE THIS FLAG:
-// Set to 'true' to use mock data in-memory.
-// Set to 'false' to route everything to the real backend.
-const USE_MOCK = true;
+const USE_MOCK = process.env.REACT_APP_USE_MOCK_API === 'true';
 
-// In-memory working copy so create, edit, and delete actually work during testing
-let memoryReports: Report[] = [...MOCK_REPORTS];
+const cleanParams = (params: Record<string, unknown>): Record<string, unknown> =>
+  Object.fromEntries(
+    Object.entries(params).filter(
+      ([, value]) => value !== undefined && value !== null && value !== ''
+    )
+  );
 
-// Helper to simulate network latency (300ms)
-const sleep = (ms = 300) => new Promise((resolve) => setTimeout(resolve, ms));
+const unwrapReport = (payload: any): Report =>
+  payload?.report ?? payload?.data ?? payload;
 
-export const getAllReports = async (): Promise<Report[]> => {
+const unwrapReports = (payload: any): Report[] => {
+  if (Array.isArray(payload)) return payload;
+  return payload?.reports ?? payload?.items ?? payload?.data ?? [];
+};
+
+export const getAllReports = async (
+  filters: ReportFilterParams = {}
+): Promise<Report[]> => {
   if (USE_MOCK) {
-    await sleep();
-    return [...memoryReports];
+    const reports = await mockReportService.getAll();
+    const { search, ...query } = filters;
+    let result = reports;
+    if (query.type) result = result.filter((r) => r.type === query.type);
+    if (query.status) result = result.filter((r) => r.status === query.status);
+    if (query.category) result = result.filter((r) => r.category === query.category);
+    if (query.location) {
+      const loc = query.location.toLowerCase();
+      result = result.filter((r) => r.location.toLowerCase().includes(loc));
+    }
+    if (query.sort === 'oldest') result = [...result].reverse();
+    return result;
   }
-  const res = await axiosInstance.get('/reports');
-  return res.data;
+  const { search, ...query } = filters;
+  const res = await axiosInstance.get('/reports', {
+    params: cleanParams(query),
+  });
+  return unwrapReports(res.data);
 };
 
 export const getReportById = async (id: string): Promise<Report> => {
   if (USE_MOCK) {
-    await sleep();
-    const item = memoryReports.find((r) => r._id === id);
-    if (!item) throw new Error('Report not found');
-    return item;
+    return mockReportService.getById(id);
   }
   const res = await axiosInstance.get(`/reports/${id}`);
-  return res.data;
+  return unwrapReport(res.data);
 };
 
 export const createReport = async (data: ReportFormData): Promise<Report> => {
   if (USE_MOCK) {
-    await sleep();
-    const newReport: Report = {
-      ...data,
-      _id: String(Date.now()),
-      reporter: 'mock_user_1',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    memoryReports.unshift(newReport);
-    return newReport;
+    return mockReportService.create(data as any);
   }
   const res = await axiosInstance.post('/reports', data);
-  return res.data;
+  return unwrapReport(res.data);
 };
 
-export const updateReport = async (id: string, data: ReportFormData): Promise<Report> => {
+export const updateReport = async (
+  id: string,
+  data: ReportFormData
+): Promise<Report> => {
   if (USE_MOCK) {
-    await sleep();
-    const index = memoryReports.findIndex((r) => r._id === id);
-    if (index === -1) throw new Error('Report not found');
-    memoryReports[index] = {
-      ...memoryReports[index],
-      ...data,
-      updatedAt: new Date().toISOString(),
-    };
-    return memoryReports[index];
+    return mockReportService.update(id, data as any);
   }
   const res = await axiosInstance.put(`/reports/${id}`, data);
-  return res.data;
+  return unwrapReport(res.data);
 };
 
 export const deleteReport = async (id: string): Promise<void> => {
   if (USE_MOCK) {
-    await sleep();
-    memoryReports = memoryReports.filter((r) => r._id !== id);
-    return;
+    return mockReportService.delete(id);
   }
   await axiosInstance.delete(`/reports/${id}`);
+};
+
+export const searchReports = async (q: string): Promise<Report[]> => {
+  if (USE_MOCK) {
+    return mockReportService.search(q);
+  }
+  const res = await axiosInstance.get('/reports/search', { params: { q } });
+  return unwrapReports(res.data);
+};
+
+export const getReportMatches = async (id: string): Promise<Report[]> => {
+  if (USE_MOCK) {
+    return [];
+  }
+  const res = await axiosInstance.get(`/reports/${id}/matches`);
+  return unwrapReports(res.data);
 };

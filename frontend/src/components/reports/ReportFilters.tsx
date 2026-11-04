@@ -19,7 +19,12 @@ export default function ReportFilters({
   };
 
   const hasActiveFilters =
-    Boolean(filters.search) || Boolean(filters.type) || Boolean(filters.status) || Boolean(filters.category);
+    Boolean(filters.search) ||
+    Boolean(filters.type) ||
+    Boolean(filters.status) ||
+    Boolean(filters.category) ||
+    Boolean(filters.location) ||
+    Boolean(filters.sort);
 
   return (
     <section className="report-filters">
@@ -31,13 +36,25 @@ export default function ReportFilters({
           id="report-search"
           type="search"
           className="report-filters__input"
-          placeholder="Search by title, description, or location..."
+          placeholder="Search by title or description..."
           value={filters.search || ''}
           onChange={(e) => update({ search: e.target.value })}
         />
       </div>
 
       <div className="report-filters__group">
+        <label htmlFor="filter-location" className="sr-only">
+          Location
+        </label>
+        <input
+          id="filter-location"
+          type="text"
+          className="report-filters__input report-filters__location"
+          placeholder="Location"
+          value={filters.location || ''}
+          onChange={(e) => update({ location: e.target.value || undefined })}
+        />
+
         <label htmlFor="filter-type" className="sr-only">
           Type
         </label>
@@ -89,6 +106,21 @@ export default function ReportFilters({
               {category}
             </option>
           ))}
+        </select>
+
+        <label htmlFor="filter-sort" className="sr-only">
+          Sort
+        </label>
+        <select
+          id="filter-sort"
+          className="report-filters__select"
+          value={filters.sort || ''}
+          onChange={(e) =>
+            update({ sort: (e.target.value || undefined) as ReportFilterParams['sort'] })
+          }
+        >
+          <option value="">Newest first</option>
+          <option value="oldest">Oldest first</option>
         </select>
       </div>
 

@@ -1,29 +1,57 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import type { Report, ReportFormData } from '../../types/report.types';
+import type {
+  Report,
+  ReportFormData,
+  ReportFilterParams,
+} from '../../types/report.types';
 import * as reportService from '../../api/reportService';
 
 interface ReportsState {
   items: Report[];
   selectedReport: Report | null;
+  matches: Report[];
   loading: boolean;
+  matchesLoading: boolean;
   error: string | null;
 }
 
 const initialState: ReportsState = {
   items: [],
   selectedReport: null,
+  matches: [],
   loading: false,
+  matchesLoading: false,
   error: null,
 };
 
+const getErrorMessage = (err: any, fallback: string): string =>
+  err?.response?.data?.message ||
+  err?.response?.data?.error ||
+  err?.message ||
+  fallback;
+
 // Async Thunks
-export const fetchReports = createAsyncThunk('reports/fetchAll', async (_, { rejectWithValue }) => {
-  try {
-    return await reportService.getAllReports();
-  } catch (err: any) {
-    return rejectWithValue(err.message || 'Failed to fetch reports');
+export const fetchReports = createAsyncThunk(
+  'reports/fetchAll',
+  async (filters: ReportFilterParams = {}, { rejectWithValue }) => {
+    try {
+      return await reportService.getAllReports(filters);
+    } catch (err: any) {
+      return rejectWithValue(getErrorMessage(err, 'Failed to fetch reports'));
+    }
   }
-});
+);
+
+export const searchReports = createAsyncThunk(
+  'reports/search',
+  async (query: string, { rejectWithValue }) => {
+    try {
+      return await reportService.searchReports(query);
+    } catch (err: any) {
+      return rejectWithValue(getErrorMessage(err, 'Failed to search reports'));
+    }
+  }
+);
 
 export const fetchReportById = createAsyncThunk(
   'reports/fetchById',
@@ -31,7 +59,18 @@ export const fetchReportById = createAsyncThunk(
     try {
       return await reportService.getReportById(id);
     } catch (err: any) {
-      return rejectWithValue(err.message || 'Report not found');
+      return rejectWithValue(getErrorMessage(err, 'Report not found'));
+    }
+  }
+);
+
+export const fetchReportMatches = createAsyncThunk(
+  'reports/fetchMatches',
+  async (id: string, { rejectWithValue }) => {
+    try {
+      return await reportService.getReportMatches(id);
+    } catch (err: any) {
+      return rejectWithValue(getErrorMessage(err, 'Failed to load matches'));
     }
   }
 );
@@ -42,7 +81,7 @@ export const addReport = createAsyncThunk(
     try {
       return await reportService.createReport(data);
     } catch (err: any) {
-      return rejectWithValue(err.message || 'Failed to create report');
+      return rejectWithValue(getErrorMessage(err, 'Failed to create report'));
     }
   }
 );
@@ -54,7 +93,7 @@ export const removeReport = createAsyncThunk(
       await reportService.deleteReport(id);
       return id;
     } catch (err: any) {
-      return rejectWithValue(err.message || 'Failed to delete report');
+      return rejectWithValue(getErrorMessage(err, 'Failed to delete report'));
     }
   }
 );
@@ -65,7 +104,7 @@ export const updateExistingReport = createAsyncThunk(
     try {
       return await reportService.updateReport(id, data);
     } catch (err: any) {
-      return rejectWithValue(err.message || 'Failed to update report');
+      return rejectWithValue(getErrorMessage(err, 'Failed to update report'));
     }
   }
 );
@@ -76,6 +115,9 @@ const reportsSlice = createSlice({
   reducers: {
     clearSelectedReport: (state) => {
       state.selectedReport = null;
+    },
+    clearMatches: (state) => {
+      state.matches = [];
     },
   },
   extraReducers: (builder) => {
@@ -94,6 +136,20 @@ const reportsSlice = createSlice({
         state.error = action.payload as string;
       })
 
+      // Search
+      .addCase(searchReports.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(searchReports.fulfilled, (state, action: PayloadAction<Report[]>) => {
+        state.loading = false;
+        state.items = action.payload;
+      })
+      .addCase(searchReports.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
       // Fetch by ID
       .addCase(fetchReportById.pending, (state) => {
         state.loading = true;
@@ -108,6 +164,19 @@ const reportsSlice = createSlice({
         state.error = action.payload as string;
       })
 
+      // Fetch matches
+      .addCase(fetchReportMatches.pending, (state) => {
+        state.matchesLoading = true;
+      })
+      .addCase(fetchReportMatches.fulfilled, (state, action: PayloadAction<Report[]>) => {
+        state.matchesLoading = false;
+        state.matches = action.payload;
+      })
+      .addCase(fetchReportMatches.rejected, (state) => {
+        state.matchesLoading = false;
+        state.matches = [];
+      })
+
       // Add Report
       .addCase(addReport.fulfilled, (state, action: PayloadAction<Report>) => {
         state.items.unshift(action.payload);
@@ -120,18 +189,19 @@ const reportsSlice = createSlice({
           state.selectedReport = null;
         }
       })
-      
+
+      // Update Report
       .addCase(updateExistingReport.fulfilled, (state, action: PayloadAction<Report>) => {
-    const index = state.items.findIndex((item) => item._id === action.payload._id);
-      if (index !== -1) {
-        state.items[index] = action.payload;
-      }
-      if (state.selectedReport?._id === action.payload._id) {
-        state.selectedReport = action.payload;
-      }
-    });
+        const index = state.items.findIndex((item) => item._id === action.payload._id);
+        if (index !== -1) {
+          state.items[index] = action.payload;
+        }
+        if (state.selectedReport?._id === action.payload._id) {
+          state.selectedReport = action.payload;
+        }
+      });
   },
 });
 
-export const { clearSelectedReport } = reportsSlice.actions;
+export const { clearSelectedReport, clearMatches } = reportsSlice.actions;
 export default reportsSlice.reducer;

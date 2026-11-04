@@ -41,10 +41,15 @@ export type ReportFormData = Omit<Report, '_id' | 'reporter' | 'createdAt' | 'up
   status?: 'OPEN' | 'RESOLVED';
 };
 
+// Sort options supported by GET /reports?sort=
+export type ReportSort = 'newest' | 'oldest';
+
 // Search and filter parameters (for Home page or filter widgets)
 export interface ReportFilterParams {
   type?: 'LOST' | 'FOUND';
   category?: LostItemCategory;
   status?: 'OPEN' | 'RESOLVED';
+  location?: string;
+  sort?: ReportSort;
   search?: string;
 }

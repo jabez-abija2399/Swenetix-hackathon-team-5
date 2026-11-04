@@ -1,12 +1,14 @@
-import { Routes, Route } from 'react-router-dom';
-import Navbar from './components/layout/Navbar';
-import ProtectedRoute from './components/common/ProtectedRoute';
-import Home from './app/Home';
-import ReportDetail from './app/ReportDetail';
-import CreateReport from './app/CreateReport';
-import EditReport from './app/EditReport';
-import NotFound from './app/NotFound';
-import Login from './app/Login';
+import { Routes, Route } from "react-router-dom";
+import Navbar from "./components/layout/Navbar";
+
+import LandingPage from "./app/LandingPage";
+import Home from "./app/Home";
+import ReportDetail from "./app/ReportDetail";
+import CreateReport from "./app/CreateReport";
+import EditReport from "./app/EditReport";
+import NotFound from "./app/NotFound";
+import Login from "./app/Login";
+import Signup from "./app/Signup";
 
 export default function App() {
   return (
@@ -14,13 +16,24 @@ export default function App() {
       <Navbar />
 
       <Routes>
-        <Route path="/" element={
-          // <ProtectedRoute>
-          <Home />
-          //  </ProtectedRoute>
-          } 
-          />
+        {/* Public landing page */}
+        <Route path="/" element={<LandingPage />} />
+
+        {/* Authentication */}
         <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+
+        {/* Protected report feed */}
+        <Route
+          path="/reports"
+          element={
+            // <ProtectedRoute>
+              <Home />
+            // </ProtectedRoute>
+          }
+        />
+
+        {/* Create report */}
         <Route
           path="/reports/new"
           element={
@@ -29,7 +42,11 @@ export default function App() {
             // </ProtectedRoute>
           }
         />
+
+        {/* Report details */}
         <Route path="/reports/:id" element={<ReportDetail />} />
+
+        {/* Edit report */}
         <Route
           path="/reports/:id/edit"
           element={
@@ -38,6 +55,8 @@ export default function App() {
             // </ProtectedRoute> */}
           }
         />
+
+        {/* 404 */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>

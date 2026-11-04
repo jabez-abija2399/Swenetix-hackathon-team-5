@@ -19,7 +19,7 @@ export default function Login() {
 
     try {
       await dispatch(loginUser({ email, password })).unwrap();
-      navigate(from, { replace: true });
+      navigate(from || '/reports', { replace: true });
     } catch {
       // Error handled via Redux state
     }
@@ -30,7 +30,7 @@ export default function Login() {
       title="Sign In"
       footer={
         <>
-          Back to <Link to="/">Home</Link>
+          Don't have an account? <Link to="/signup">Sign Up</Link>
         </>
       }
     >

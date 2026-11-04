@@ -6,7 +6,6 @@ import { logout } from '../../store/slices/authSlice';
 export default function Navbar() {
   const dispatch = useAppDispatch();
   
-  // Safe extraction with empty object fallback:
   const { user = null, isAuthenticated = false } = useAppSelector(
     (state) => state.auth || {}
   );
@@ -25,7 +24,10 @@ export default function Navbar() {
             </button>
           </>
         ) : (
-          <Link to="/login">Login</Link>
+          <>
+            <Link to="/signup">Sign Up</Link>
+            <Link to="/login">Login</Link>
+          </>
         )}
       </div>
     </nav>

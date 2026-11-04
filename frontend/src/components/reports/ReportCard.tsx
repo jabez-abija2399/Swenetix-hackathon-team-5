@@ -7,24 +7,34 @@ interface Props {
 }
 
 export default function ReportCard({ report, onClick }: Props) {
-  return (
-    <div className="report-card" onClick={onClick}>
-      {/* Status (OPEN / RESOLVED) */}
-      <StatusBadge status={report.status} />
+  const accentColor = report.type === 'LOST' ? 'border-l-[#B54834]' : 'border-l-[#4A6B57]';
 
-      {/* Optional image thumbnail if available */}
+  return (
+    <div
+      onClick={onClick}
+      className={`group flex cursor-pointer flex-col gap-3 rounded-md border border-[#E3DCCB] border-l-[3px] ${accentColor} bg-white p-5 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md hover:border-[#9A927F]`}
+    >
+      <div className="flex flex-wrap gap-2">
+        <StatusBadge status={report.type} />
+        <StatusBadge status={report.status} />
+      </div>
+
       {report.imagePath && (
-        <div style={{ marginTop: '0.5rem', borderRadius: '6px', overflow: 'hidden', maxHeight: '160px' }}>
+        <div className="overflow-hidden rounded-sm">
           <img
             src={report.imagePath}
             alt={report.title}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            className="h-40 w-full object-cover transition-transform duration-200 group-hover:scale-[1.02]"
           />
         </div>
       )}
 
-      <h3 style={{ marginTop: '0.75rem' }}>{report.title}</h3>
-      <p>{report.category} • {report.location}</p>
+      <h3 className="font-serif text-lg font-semibold text-[#2B2A28]">
+        {report.title}
+      </h3>
+      <p className="text-sm text-[#6B6459]">
+        {report.category} • {report.location}
+      </p>
     </div>
   );
 }
